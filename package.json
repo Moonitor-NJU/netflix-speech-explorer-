@@ -1,0 +1,8 @@
+{
+  "name": "netflix-speech-explorer",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "deploy:cloudflare": "wrangler pages deploy docs --project-name netflix-speech-explorer --branch main"
+  }
+}
