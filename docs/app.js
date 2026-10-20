@@ -41,7 +41,7 @@ function detail(path){const r=data.rows.find(r=>r.path===path);if(!r)return;$('d
  $('detail-body').innerHTML=`<div class="path-block">${escapeHTML(r.path)}</div><div class="button-row" style="margin-top:10px"><button class="button quiet" id="copy-path">复制服务器路径</button></div><div class="detail-grid">${fields.map(([k,v])=>`<div><label>${k}</label><strong>${escapeHTML(v)}</strong></div>`).join('')}</div><h3>高频原始描述</h3><div class="detail-tags">${Object.entries(r.tags).map(([t,n])=>`<span class="small-badge">[${escapeHTML(t)}] × ${fmt(n)}</span>`).join('')||`<span class="detail-note">${!r.srt?'无同名字幕，不能判断标签':r.analyzed?'未发现方括号描述':'本文件尚未读取字幕'}</span>`}</div><p class="detail-note">展示本文件出现最多的 12 个归一化标签。人物名和语气描述可能混合出现。</p><h3 style="margin-top:25px">描述字幕示例</h3>${r.examples.map(e=>`<div class="example"><time>${e.start.toFixed(3)}s → ${e.end.toFixed(3)}s</time>${escapeHTML(e.text)}</div>`).join('')||`<p class="detail-note">${!r.srt?'没有同名字幕文件':r.analyzed?'无描述字幕示例':'本文件尚未读取字幕'}</p>`}${r.errors.length?`<div class="notice">${r.errors.map(escapeHTML).join('<br>')}</div>`:''}<p class="detail-note">原始音频保留在服务器。已提取的少量候选片段见下方；未提取的文件可复制路径在服务器抽听。</p>${r.counterpart_path?`<h3 style="margin-top:20px">跨目录同名候选（未验证语言 / 对齐）</h3><div class="path-block">${escapeHTML(r.counterpart_path)}</div>`:''}${r.metadata_path?`<div class="path-block" style="margin-top:12px">代表性元数据：${escapeHTML(r.metadata_path)}</div>`:''}`;
  $('copy-path').onclick=async()=>{try{await navigator.clipboard.writeText(r.path);toast('已复制服务器路径')}catch{toast('剪贴板不可用，请选中上方路径复制')}};$('detail').showModal()}
 function view(){let id=location.hash.replace('#','')||'overview';if(!['overview','labels','languages','quality','samples','guide'].includes(id))id='overview';document.querySelectorAll('.view').forEach(v=>v.hidden=v.id!=='view-'+id);document.querySelectorAll('nav a').forEach(a=>a.classList.toggle('active',a.dataset.view===id));$('breadcrumb').textContent={overview:'数据概览',labels:'标签图谱',languages:'语种与标签体系',quality:'质量检查',samples:'样本浏览器',guide:'使用指南'}[id];window.scrollTo({top:0})}
-function events(){$('tag-table').addEventListener('click',e=>{const b=e.target.closest('[data-tag]');if(!b)return;$('reset-filters').click();currentTag=b.dataset.tag;$('sample-track').value='all';samplePage=0;renderSamples();location.hash='samples'});$('clear-selected-tag').onclick=()=>{currentTag=null;renderSamples()};window.addEventListener('hashchange',view);document.querySelectorAll('[data-scope]').forEach(b=>b.onclick=()=>{scope=b.dataset.scope;document.querySelectorAll('[data-scope]').forEach(x=>x.classList.toggle('active',x.dataset.scope===scope));overview()});$('tag-search').oninput=()=>{tagPage=0;renderTags()};$('tag-prev').onclick=()=>{tagPage--;renderTags()};$('tag-next').onclick=()=>{tagPage++;renderTags()};$('sample-prev').onclick=()=>{samplePage--;renderSamples()};$('sample-next').onclick=()=>{samplePage++;renderSamples()};['sample-search','sample-track','sample-group','sample-type','sample-rating','sample-category','min-duration','max-duration','max-wer','sample-quality','sample-sort','sample-analysis'].forEach(id=>$(id).addEventListener(id==='sample-search'||id.includes('duration')||id==='max-wer'?'input':'change',()=>{samplePage=0;renderSamples()}));$('reset-filters').onclick=()=>{currentTag=null;['sample-search','min-duration','max-duration','max-wer'].forEach(id=>$(id).value='');['sample-group','sample-type','sample-rating','sample-category','sample-quality'].forEach(id=>$(id).value='all');$('sample-analysis').value='all';$('sample-track').value='wavs';$('sample-sort').value='id';samplePage=0;renderSamples()};$('sample-table').onclick=e=>{const b=e.target.closest('[data-path]');if(b)detail(b.dataset.path)};$('close-detail').onclick=()=>$('detail').close();$('detail').addEventListener('click',e=>{if(e.target===$('detail')){const r=$('detail').getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)$('detail').close()}});
+function events(){$('tag-table').addEventListener('click',e=>{const b=e.target.closest('[data-tag]');if(!b)return;$('reset-filters').click();currentTag=b.dataset.tag;$('sample-track').value='all';samplePage=0;renderSamples();location.hash='search'});$('clear-selected-tag').onclick=()=>{currentTag=null;renderSamples()};window.addEventListener('hashchange',view);document.querySelectorAll('[data-scope]').forEach(b=>b.onclick=()=>{scope=b.dataset.scope;document.querySelectorAll('[data-scope]').forEach(x=>x.classList.toggle('active',x.dataset.scope===scope));overview()});$('tag-search').oninput=()=>{tagPage=0;renderTags()};$('tag-prev').onclick=()=>{tagPage--;renderTags()};$('tag-next').onclick=()=>{tagPage++;renderTags()};$('sample-prev').onclick=()=>{samplePage--;renderSamples()};$('sample-next').onclick=()=>{samplePage++;renderSamples()};['sample-search','sample-track','sample-group','sample-type','sample-rating','sample-category','min-duration','max-duration','max-wer','sample-quality','sample-sort','sample-analysis'].forEach(id=>$(id).addEventListener(id==='sample-search'||id.includes('duration')||id==='max-wer'?'input':'change',()=>{samplePage=0;renderSamples()}));$('reset-filters').onclick=()=>{currentTag=null;['sample-search','min-duration','max-duration','max-wer'].forEach(id=>$(id).value='');['sample-group','sample-type','sample-rating','sample-category','sample-quality'].forEach(id=>$(id).value='all');$('sample-analysis').value='all';$('sample-track').value='wavs';$('sample-sort').value='id';samplePage=0;renderSamples()};$('sample-table').onclick=e=>{const b=e.target.closest('[data-path]');if(b)detail(b.dataset.path)};$('close-detail').onclick=()=>$('detail').close();$('detail').addEventListener('click',e=>{if(e.target===$('detail')){const r=$('detail').getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)$('detail').close()}});
  $('export-tags').onclick=()=>download('netflix-label-dictionary.csv',csv([['tag','heuristic_category','occurrences'],...data.tags.map(t=>[t.tag,t.category,t.count])]),'text/csv;charset=utf-8');$('export-csv').onclick=()=>{const keys=['id','title','title_id','season','episode','episode_title','type','rating','year','group','track','path','duration','duration_source','header_checked','sr','channels','bits','srt','subtitle_status','cues','tagged_cues','bracket_only','lyric_cues','overlap','bad_time','out_of_bounds','wer','wer_status','wer_median','asr_transcribe_seconds','asr_recorded_duration','asr_cc_total_segments','wer_csv_median','wer_csv_duration_s','wer_source','wer_scored_segments','wer_ref_words','wer_edits','wer_micro','metadata_status','metadata_path','metadata_episode_path','metadata_runtime','metadata_id','boundary_checked','subtitle_span_union_seconds','wer_num_parts','wer_speech_segments','analyzed','han_cues','subtitle_seconds','errors','counterpart_path','manifest_languages','audio_language','audio_language_status','subtitle_script','tag_categories','research_categories','research_parent_categories','tags','selected_tag'];download('netflix-filtered-files.csv',csv([keys.map(k=>k==='tags'?'top_12_tags':k),...filteredSamples.map(r=>keys.map(k=>k==='selected_tag'?currentTag:r[k]!==null&&typeof r[k]==='object'?JSON.stringify(r[k]):r[k]))]),'text/csv;charset=utf-8')};$('export-scp').onclick=()=>{const idCounts={};filteredSamples.forEach(r=>idCounts[r.id]=(idCounts[r.id]||0)+1);download('netflix-filtered-wavs.scp',filteredSamples.map(r=>`${idCounts[r.id]>1?r.group+'_'+r.track+'_'+r.id:r.id} ${r.path}`).join('\n')+'\n')};$('download-json').onclick=()=>download('netflix-dataset-statistics.json',JSON.stringify(data),'application/json');}
 async function init(){try{const inlineData=$('dataset-inline');if(inlineData){data=JSON.parse(inlineData.textContent)}else{const response=await fetch('data.json',{cache:'no-cache'});if(!response.ok)throw Error('HTTP '+response.status);data=await response.json();if(data.snapshot_parts){const parts=await Promise.all(data.snapshot_parts.map(async name=>{const part=await fetch(name,{cache:'no-cache'});if(!part.ok)throw Error(name+' HTTP '+part.status);return part.text()}));data=JSON.parse(parts.join(''))}};if(data.partial){$('scan-banner').hidden=false;$('scan-banner').textContent='扫描进行中：已完成 '+fmt(data.rows.length)+' / '+fmt(data.planned_files)+' 个文件。以下仅展示已完成文件的统计，不代表全量结果。'}if(data.sample_mode){$('scan-banner').hidden=false;$('scan-banner').textContent='分析范围：全量文件清单 '+fmt(data.rows.length)+' 个；已分析文件 '+fmt(data.rows.filter(r=>r.analyzed).length)+' 个。字幕与标签统计来自分批次/分目录抽样及此前已读文件，不代表全库分布估计。'}if(data.subtitle_scope_complete){$('scan-banner').hidden=false;$('scan-banner').textContent='字幕分析完成：已核对 '+fmt(data.rows.length)+' 个 WAV；读取 '+fmt(data.subtitle_files_read)+' 个配对 SRT 的全部条目；'+fmt(data.subtitle_files_missing)+' 个 WAV 缺少同名字幕。音频信号、文件头、元数据与 WER 的检查范围另见各项说明。'}const dt=new Date(data.generated_at),date=dt.toLocaleString('zh-CN',{timeZone:'Asia/Shanghai',hour12:false});$('scan-date').textContent='更新于 '+date;$('footer-stamp').textContent='服务器扫描 · '+date;$('method-date').textContent=`统计时间：${date}（UTC+8）。服务器：${data.host}。本页面是只读快照，不自动连接服务器。`;$('loading').hidden=true;$('app').hidden=false;overview();labels();quality();initSamples();events();view();const heights=[7,10,15,24,18,30,48,62,41,72,90,61,48,69,85,94,66,47,76,58,39,52,30,44,26,17,22,13,9,7];document.querySelector('.waveform').innerHTML=heights.map(h=>`<i style="height:${h}px"></i>`).join('')}catch(e){$('loading').hidden=true;$('error').hidden=false;$('error').textContent='统计快照加载失败。请通过 HTTP 服务打开此页面，并确认 data.json 已生成。'+e.message}}
 /* COMPLETE_STATISTICS_UI_START */
@@ -138,7 +138,7 @@ events=function(){researchBaseEvents();
  $('listen-parents').onclick=e=>{const b=e.target.closest('[data-listen-parent]');if(!b)return;listenParent=b.dataset.listenParent;listenLeaf=Object.keys(data.taxonomy.leaves).find(k=>data.taxonomy.leaves[k].parent===listenParent);listenExact=null;renderListening()};
  $('listen-leaves').onclick=e=>{const b=e.target.closest('[data-listen-sub]');if(!b)return;listenLeaf=b.dataset.listenSub;listenExact=null;renderListening()};
  $('listen-clear').onclick=()=>{listenExact=null;renderListening()};
- $('tag-table').addEventListener('click',e=>{const b=e.target.closest('[data-listen-leaf]');if(!b)return;listenLeaf=b.dataset.listenLeaf;listenParent=data.taxonomy.leaves[listenLeaf].parent;listenExact=null;renderListening();location.hash='samples';$('listening-library').scrollIntoView({behavior:'smooth',block:'start'})});
+ $('tag-table').addEventListener('click',e=>{const b=e.target.closest('[data-listen-leaf]');if(!b)return;listenLeaf=b.dataset.listenLeaf;listenParent=data.taxonomy.leaves[listenLeaf].parent;listenExact=null;renderListening();location.hash='listen';$('listening-library').scrollIntoView({behavior:'smooth',block:'start'})});
  document.addEventListener('click',e=>{const b=e.target.closest('[data-clip-file]');if(b)detail(b.dataset.clipFile)});
  $('close-detail').addEventListener('click',()=>$('detail').querySelectorAll('audio').forEach(a=>a.pause()));
  $('detail').addEventListener('close',()=>$('detail').querySelectorAll('audio').forEach(a=>a.pause()));
@@ -211,6 +211,77 @@ events=function(){languageBaseEvents();
  $('sample-audio-language').onchange=()=>{samplePage=0;renderSamples()};
 };
 /* LANGUAGE_CONTEXT_UI_END */
+
+/* SEARCH_LISTEN_UI_START */
+// Separate full-corpus retrieval state from the curated listening library.
+const searchBaseRender=researchBaseRenderSamples;
+const searchEvidenceCache=new Map();
+function selectedSearchCategory(){return $('sample-category').value||'all'}
+function searchCategoryCount(r,value=selectedSearchCategory()){
+ if(value==='all')return null;
+ const [level,key]=value.split(':');
+ return level==='parent'?(r.research_parent_categories?.[key]||0):(r.research_categories?.[key]||0);
+}
+function searchCategoryLabel(value=selectedSearchCategory()){
+ if(value==='all')return '全部声音类型';
+ const [level,key]=value.split(':');return level==='parent'?data.taxonomy.parents[key]?.label:taxPath(key);
+}
+function searchEvidence(pageRows){
+ const value=selectedSearchCategory(), cacheKey=value+'\n'+(currentTag||'')+'\n'+pageRows.map(r=>r.path).join('\n');
+ if(searchEvidenceCache.has(cacheKey))return searchEvidenceCache.get(cacheKey);
+ const evidence=new Map(pageRows.map(r=>[r.path,[]]));
+ const [level,key]=value.split(':');
+ for(const t of data.tags){
+  if(currentTag!==null?t.tag!==currentTag:value!=='all'&&!t.taxonomy.some(k=>level==='leaf'?k===key:data.taxonomy.leaves[k]?.parent===key))continue;
+  for(const i of data.tag_file_indices[t.tag]||[]){const tags=evidence.get(data.rows[i].path);if(tags&&tags.length<5)tags.push(t.tag)}
+ }
+ if(searchEvidenceCache.size>8)searchEvidenceCache.clear();searchEvidenceCache.set(cacheKey,evidence);return evidence;
+}
+function renderSearchSelectors(){
+ const value=selectedSearchCategory(),[level,key]=value.split(':');
+ const parent=level==='parent'?key:level==='leaf'?data.taxonomy.leaves[key]?.parent:'all';
+ $('search-parent').innerHTML='<option value="all">全部大类</option>'+Object.entries(data.taxonomy.parents).map(([k,v])=>`<option value="${k}">${escapeHTML(v.label)}</option>`).join('');
+ $('search-parent').value=parent;
+ $('search-leaf').innerHTML='<option value="all">当前大类 · 全部小类</option>'+Object.entries(data.taxonomy.leaves).filter(([k,v])=>parent==='all'||v.parent===parent).map(([k,v])=>`<option value="${k}">${escapeHTML(parent==='all'?data.taxonomy.parents[v.parent].label+' / '+v.label:v.label)}</option>`).join('');
+ $('search-leaf').value=level==='leaf'?key:'all';
+}
+renderSamples=function(){
+ // The original renderer owns filtering and pagination only; listening state is independent.
+ searchBaseRender();renderSearchSelectors();
+ const pageRows=filteredSamples.slice(samplePage*PAGE_SIZE,(samplePage+1)*PAGE_SIZE),evidence=searchEvidence(pageRows);
+ $('search-query-summary').textContent=`${searchCategoryLabel()}${currentTag!==null?' · 原始描述 ['+currentTag+']':''} · ${fmt(filteredSamples.length)} 个候选文件`;
+ $('sample-table').innerHTML=pageRows.map(r=>{
+  const hits=searchCategoryCount(r),tags=evidence.get(r.path)||[];
+  return `<tr><td><button class="sample-name" data-path="${escapeHTML(r.path)}">${escapeHTML(r.title||r.id)}${r.season!==null?` <span class="sample-id">S${r.season} E${r.episode}</span>`:''}</button><span class="sample-id">${escapeHTML(r.id)} · ${r.type==='show'?'剧集':r.type==='movie'?'电影':'类型未记录'}</span><span class="sample-id">${r.duration===null?'时长未知':(r.duration/60).toFixed(1)+' 分钟'} · ${escapeHTML(r.group)} / ${escapeHTML(r.track)}</span></td><td><strong>${hits===null?(currentTag!==null?'原始标签命中':'已记录标签线索'):fmt(hits)+' 次描述命中'}</strong><div class="search-hit-tags">${tags.map(t=>`<span class="small-badge">[${escapeHTML(t)}]</span>`).join('')||'<span class="sample-id">无可展示的方括号描述；不代表没有声音事件</span>'}</div><span class="sample-id">${hits===null?'':escapeHTML(searchCategoryLabel())+' · '}最多展示 5 种命中描述</span></td><td><code class="search-path">${escapeHTML(r.path)}</code><div class="button-row"><button class="button quiet" data-copy-wav="${escapeHTML(r.path)}">复制 WAV 路径</button><button class="button quiet" data-path="${escapeHTML(r.path)}">详情</button></div></td></tr>`;
+ }).join('')||'<tr><td colspan="3" class="empty">没有匹配文件，请放宽声音类型、语种或其他筛选条件。无标签不能据此判定无对应声音。</td></tr>';
+};
+const splitBaseInitSamples=initSamples;
+initSamples=function(){splitBaseInitSamples();$('sample-track').value='all';renderSamples()};
+view=function(){
+ let id=location.hash.slice(1)||'overview';if(id==='samples')id='listen';
+ if(!['overview','labels','languages','quality','listen','search','guide'].includes(id))id='overview';
+ document.querySelectorAll('.view').forEach(v=>v.hidden=v.id!=='view-'+id);
+ document.querySelectorAll('nav a').forEach(a=>a.classList.toggle('active',a.dataset.view===id));
+ $('breadcrumb').textContent={overview:'数据概览',labels:'标签图谱',languages:'语种与标签体系',quality:'质量检查',listen:'样例试听',search:'数据检索',guide:'使用指南'}[id];
+ document.querySelectorAll('audio').forEach(a=>a.pause());window.scrollTo({top:0});
+};
+async function copyWavPaths(paths){
+ const text=paths.join('\n');if(!text)return toast('当前没有可复制的候选文件');
+ try{await navigator.clipboard.writeText(text);toast(`已复制 ${paths.length} 条 WAV 路径`)}catch{window.prompt('复制服务器 WAV 路径',text)}
+}
+const splitBaseEvents=events;
+events=function(){splitBaseEvents();
+ $('search-parent').onchange=e=>{const p=e.target.value;$('sample-category').value=p==='all'?'all':'parent:'+p;samplePage=0;renderSamples()};
+ $('search-leaf').onchange=e=>{const p=$('search-parent').value;$('sample-category').value=e.target.value==='all'?(p==='all'?'all':'parent:'+p):'leaf:'+e.target.value;samplePage=0;renderSamples()};
+ const originalReset=$('reset-filters').onclick;
+ $('reset-filters').onclick=()=>{$('sample-audio-language').value='all';originalReset();$('sample-track').value='all';renderSamples()};
+ $('sample-table').onclick=e=>{const c=e.target.closest('[data-copy-wav]');if(c)return void copyWavPaths([c.dataset.copyWav]);const b=e.target.closest('[data-path]');if(b)detail(b.dataset.path)};
+ $('copy-result-paths').onclick=()=>copyWavPaths(filteredSamples.map(r=>r.path));
+ $('export-paths').onclick=()=>{if(!filteredSamples.length)return toast('当前没有可导出的候选文件');download('netflix-filtered-wav-paths.txt',filteredSamples.map(r=>r.path).join('\n')+'\n','text/plain;charset=utf-8')};
+ $('export-csv').onclick=()=>{const keys=['id','title','title_id','season','episode','episode_title','type','rating','year','group','track','path','duration','duration_source','header_checked','sr','channels','bits','srt','subtitle_status','cues','tagged_cues','bracket_only','lyric_cues','overlap','bad_time','out_of_bounds','wer','wer_status','wer_median','asr_transcribe_seconds','asr_recorded_duration','asr_cc_total_segments','wer_csv_median','wer_csv_duration_s','wer_source','wer_scored_segments','wer_ref_words','wer_edits','wer_micro','metadata_status','metadata_path','metadata_episode_path','metadata_runtime','metadata_id','boundary_checked','subtitle_span_union_seconds','wer_num_parts','wer_speech_segments','analyzed','han_cues','subtitle_seconds','errors','counterpart_path','manifest_languages','audio_language','audio_language_status','subtitle_script','tag_categories','research_categories','research_parent_categories','tags'];download('netflix-sound-retrieval.csv',csv([['selected_sound_category','category_description_occurrences','selected_raw_tag',...keys.map(k=>k==='tags'?'top_12_tags':k)],...filteredSamples.map(r=>[selectedSearchCategory(),searchCategoryCount(r),currentTag,...keys.map(k=>typeof r[k]==='object'&&r[k]!==null?JSON.stringify(r[k]):r[k])])]),'text/csv;charset=utf-8')};
+ $('listen-find-files').onclick=()=>{currentTag=listenExact;$('sample-category').value=listenLeaf==='all'?'parent:'+listenParent:'leaf:'+listenLeaf;$('sample-track').value='all';samplePage=0;renderSamples();location.hash='search'};
+};
+/* SEARCH_LISTEN_UI_END */
 
 init();
 

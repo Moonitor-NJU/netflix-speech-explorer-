@@ -1,6 +1,7 @@
 # Netflix Speech Explorer
 
 独立静态科研数据探索网页，可部署到 GitHub Pages 或 Cloudflare Pages。
+样例试听（`#listen`）与数据检索（`#search`）独立：按声音大类／小类定位整集 WAV，查看匹配标签、复制路径，导出 TXT／SCP／CSV。
 包含全量统计、研究标签图谱、语种核验与中英文标签独立说明目录、文件筛选、138 段短试听及 12 段约60秒多标签情境样本。
 无需 ChatGPT、服务器访问权限或后端服务。
 
