@@ -58,3 +58,9 @@
 /* AUDIO_RECOVERY_STYLE_START */
 .audio-recovery-actions{display:flex;align-items:center;flex-wrap:wrap;gap:8px 18px;margin:8px 0 12px}.audio-recovery-actions .listen-link{font-size:11px}.audio-load-status{flex-basis:100%;font-size:11px;color:#858099}.audio-load-status:empty{display:none}.audio-load-status.issue{color:#c34a67}.audio-recovery-actions button:disabled{opacity:.55;cursor:wait}
 /* AUDIO_RECOVERY_STYLE_END */
+
+
+
+/* SUBTITLE_COMPARISON_STYLE_START */
+#subtitle-comparison{border-color:#d9d0f4}#mismatch-metrics{margin:18px 0}#mismatch-metrics .metric{box-shadow:none}#mismatch-files details{max-width:100%;overflow-wrap:anywhere}#mismatch-files summary,.comparison-method summary{cursor:pointer;color:#7c66bf;font-size:12px}.comparison-method{margin:18px 0;padding:14px 16px;border-radius:9px;background:#f7f5fc}#subtitle-comparison .filter-row{align-items:end;margin-top:16px}#mismatch-downloads{flex-wrap:wrap;gap:10px}
+/* SUBTITLE_COMPARISON_STYLE_END */
