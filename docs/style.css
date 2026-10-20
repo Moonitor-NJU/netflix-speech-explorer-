@@ -52,3 +52,9 @@
 /* SEARCH_STYLE_START */
 .search-results{table-layout:fixed;min-width:840px}.search-results th:nth-child(1){width:25%}.search-results th:nth-child(2){width:31%}.search-results th:nth-child(3){width:44%}.search-results td{vertical-align:top}.search-path{display:block;white-space:normal;overflow-wrap:anywhere;background:#f5f3fb;border:1px solid #e7e3f2;padding:12px;border-radius:8px;color:#514570;font-size:11px;line-height:1.75;margin-bottom:10px;user-select:all}.search-hit-tags{display:flex;gap:5px;flex-wrap:wrap;margin:12px 0}.search-hit-tags .small-badge{white-space:normal;overflow-wrap:anywhere;max-width:100%}.search-query-summary{padding:13px 16px;background:#f4f0ff;color:#6d57b8;border-radius:8px}.search-results .button{font-size:11px;padding:8px 12px}.search-results .sample-id{display:block;margin-top:7px;line-height:1.7}.search-results strong{font-size:12px}.search-results th .listen-link{display:block;margin-top:5px}#view-search .filter-row{align-items:end}#view-search .notice{margin-bottom:20px}#view-search .notice a{display:block;margin-top:8px}#view-listen .listening-library .panel-heading{flex-wrap:wrap;gap:12px}#view-listen .page-heading p,#view-search .page-heading p{max-width:700px}
 /* SEARCH_STYLE_END */
+
+
+
+/* AUDIO_RECOVERY_STYLE_START */
+.audio-recovery-actions{display:flex;align-items:center;flex-wrap:wrap;gap:8px 18px;margin:8px 0 12px}.audio-recovery-actions .listen-link{font-size:11px}.audio-load-status{flex-basis:100%;font-size:11px;color:#858099}.audio-load-status:empty{display:none}.audio-load-status.issue{color:#c34a67}.audio-recovery-actions button:disabled{opacity:.55;cursor:wait}
+/* AUDIO_RECOVERY_STYLE_END */

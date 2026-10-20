@@ -283,5 +283,59 @@ events=function(){splitBaseEvents();
 };
 /* SEARCH_LISTEN_UI_END */
 
+/* AUDIO_RECOVERY_UI_START */
+const recoveredAudioObjects=new Map();
+function cleanAudioObjects(){for(const [audio,url] of recoveredAudioObjects)if(!audio.isConnected){URL.revokeObjectURL(url);recoveredAudioObjects.delete(audio)}}
+function audioLoadStatus(audio,message,error=false){
+ const card=audio.closest('.clip-card')||audio.parentElement;
+ const notice=card.querySelector('.audio-error');if(notice)notice.hidden=!error;
+ const status=card.querySelector('.audio-load-status');if(status){status.textContent=message;status.classList.toggle('issue',error)}
+}
+async function reloadAudio(audio){
+ if(audio.dataset.recovering==='true')return;
+ audio.dataset.recovering='true';const card=audio.closest('.clip-card')||audio.parentElement,button=card.querySelector('[data-reload-audio]');
+ if(button)button.disabled=true;audioLoadStatus(audio,'正在完整读取音频，请稍候…');
+ const original=audio.dataset.originalSrc,position=audio.currentTime||0;
+ let timer;
+ try{
+  audio.pause();
+  if(original.startsWith('data:')){audio.src=original;audio.load();return}
+  const controller=new AbortController();timer=setTimeout(()=>controller.abort(),30000);
+  const url=new URL(original,document.baseURI);url.searchParams.set('audio_retry',Date.now());
+  const response=await fetch(url.href,{cache:'no-store',signal:controller.signal});
+  if(!response.ok)throw Error('HTTP '+response.status);
+  const blob=await response.blob(),header=new Uint8Array(await blob.slice(0,12).arrayBuffer());
+  const text=String.fromCharCode(...header);
+  if(text.slice(0,4)!=='RIFF'||text.slice(8,12)!=='WAVE'||new DataView(header.buffer).getUint32(4,true)+8>blob.size)throw Error('WAV 内容不完整');
+  const previous=recoveredAudioObjects.get(audio),objectUrl=URL.createObjectURL(blob);
+  recoveredAudioObjects.set(audio,objectUrl);
+  audio.addEventListener('loadedmetadata',()=>{if(position>0&&Number.isFinite(audio.duration))audio.currentTime=Math.min(position,audio.duration)}, {once:true});
+  audio.src=objectUrl;audio.load();if(previous)URL.revokeObjectURL(previous);
+  audioLoadStatus(audio,'已重新读取音频，请点击播放。');
+ }catch(error){audioLoadStatus(audio,'重载未成功，可再次重试或单独打开 WAV。',true)}
+ finally{clearTimeout(timer);audio.dataset.recovering='false';if(button)button.disabled=false}
+}
+function wireAudioRecovery(root){
+ cleanAudioObjects();if(!root)return;
+ root.querySelectorAll('audio').forEach(audio=>{
+  if(audio.dataset.recoveryWired)return;audio.dataset.recoveryWired='true';audio.dataset.originalSrc=audio.getAttribute('src');
+  const actions=document.createElement('div');actions.className='audio-recovery-actions';
+  actions.innerHTML=`<button class="listen-link" data-reload-audio type="button">↻ 重新加载音频</button><a class="listen-link" href="${escapeHTML(audio.dataset.originalSrc)}" target="_blank" rel="noopener">单独打开 WAV ↗</a><span class="audio-load-status" role="status"></span>`;
+  audio.insertAdjacentElement('afterend',actions);actions.querySelector('[data-reload-audio]').onclick=()=>reloadAudio(audio);
+  audio.addEventListener('error',()=>{
+   if(!audio.dataset.automaticRetry){audio.dataset.automaticRetry='true';reloadAudio(audio)}
+   else if(audio.dataset.recovering!=='true')audioLoadStatus(audio,'音频未能加载，可点击重新加载或单独打开 WAV。',true);
+  });
+  audio.addEventListener('loadedmetadata',()=>{audioLoadStatus(audio,'');const notice=(audio.closest('.clip-card')||audio.parentElement).querySelector('.audio-error');if(notice)notice.hidden=true});
+ });
+}
+const recoveryBaseListening=renderListening;
+renderListening=function(){recoveryBaseListening();wireAudioRecovery($('listen-grid'))};
+const recoveryBaseLanguages=languageView;
+languageView=function(){recoveryBaseLanguages();wireAudioRecovery($('language-review-audio'))};
+const recoveryBaseDetail=detail;
+detail=function(path){recoveryBaseDetail(path);wireAudioRecovery($('detail-body'))};
+/* AUDIO_RECOVERY_UI_END */
+
 init();
 
